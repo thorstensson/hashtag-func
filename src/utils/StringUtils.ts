@@ -1,6 +1,6 @@
 export const getLastWordTyped = (): string => {
     var sel, word = "";
-    if (window.getSelection && (sel = window.getSelection()).modify) {
+    if (window.getSelection && (sel = window.getSelection()).modify && sel.rangeCount > 0) {
         var selectedRange = sel.getRangeAt(0);
         sel.collapseToStart();
         sel.modify("move", "backward", "word");

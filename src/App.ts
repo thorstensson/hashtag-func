@@ -15,7 +15,6 @@ export class App {
 
   private tagsJsonArr: string[];
   private typedTags: string[];
-  private isHashKeyed = false;
   private lastWordStr: string;
 
   /**
@@ -47,11 +46,12 @@ export class App {
     // Works for content editable except in IE 11...
     this.textbox.addEventListener("keyup", (e) => {
       if (e.key == " " || e.keyCode == 32 || e.code == "Space" || e.keyCode == 13 || e.key == "Enter" || e.code == "Enter") {
-        this.isHashKeyed = false;
         this.hideRelatedTagsList();
       }
       this.checkForHashtags();
-      this.lookupTagList();
+
+      // if we hit spacebar we dont want to hold on tag list
+      if (e.key !== " " || e.keyCode !== 32 || e.code !== "Space") this.lookupTagList();
     });
   }
 
@@ -59,21 +59,18 @@ export class App {
    * Check if we have a typed hashtag that sits in JSON list
    */
   lookupTagList() {
-    this.lastWordStr = getLastWordTyped();
+    this.lastWordStr = getLastWordTyped().trim();
     let relatedTagsArr = [];
 
-    if (this.lastWordStr == "#") this.isHashKeyed = true;
-
-    // Compare against the JSON list
-    if (this.lastWordStr && this.isHashKeyed) {
-
-      for (const word of this.tagsJsonArr) {
-        if (word.startsWith(`#${this.lastWordStr}`)) {
-          relatedTagsArr.push(word)
-        }
+    for (const word of this.tagsJsonArr) {
+      console.log("compare", word, "with", `#${this.lastWordStr}`)
+      if (word.trim().startsWith(`#${this.lastWordStr}`)) {
+        console.log("pushing", word)
+        relatedTagsArr.push(word)
       }
-      console.log("relatedTagsArr", relatedTagsArr)
     }
+
+    console.log("relatedTagsArr", relatedTagsArr);
     (relatedTagsArr.length == 0) ? this.hideRelatedTagsList() : this.showRelatedTagsInList(relatedTagsArr);
   }
 
@@ -83,7 +80,6 @@ export class App {
   showRelatedTagsInList(arr: string[]) {
     this.lookupw.style.visibility = "visible";
     this.lookupw.firstChild.innerHTML = "";
-
     let boxStr = this.textbox.innerText;
 
     for (const tag of arr) {
@@ -99,6 +95,7 @@ export class App {
         let removeBoundedStr = `\\b${rmPiece}\\b`;
         const regex = new RegExp(removeBoundedStr, 'g'); // correct way
         let result = boxStr.replaceAll(regex, e.currentTarget.innerText.slice(1))
+
         this.textbox.innerText = result;
 
         this.hideRelatedTagsList();
@@ -121,6 +118,10 @@ export class App {
 
     if (myTest) {
       this.typedTags = [...boxStr.match(pattern)];
+      //longest word first just in case we have tester , test  (we don't want to try replace in order test, tester)
+      this.typedTags.sort((a, b) => b.length - a.length);
+
+      console.log(this.typedTags)
     }
 
     //Replace & recolor all tags

@@ -3,11 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopywebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  devServer: {
-    headers: {
-      'Cache-Control': 'no-store',
-    },
-  },
   context: __dirname,
   entry: {
     app: './src/app.ts'
@@ -41,7 +36,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'src/index.html'
+      template: 'src/index.html',
+      cache:false,
     }),
     new CopywebpackPlugin({
       patterns: [
@@ -54,6 +50,12 @@ module.exports = {
     }),
   ],
   devServer: {
-    contentBase: path.join(__dirname, 'dist')
+    static: {
+        directory: path.join(__dirname, 'dist')
+    },
+    devMiddleware: {
+      writeToDisk:true,
+    }
+    
   }
 };
