@@ -21,6 +21,8 @@ body {
 
 #app {
   .content-editable-element {
+    white-space: normal;
+    word-wrap: break-word;
     background-color: white;
     display: block;
     box-sizing: padding-box;

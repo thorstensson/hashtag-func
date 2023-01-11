@@ -18,3 +18,23 @@ export const getLastWordTyped = (): string => {
     return word;
 };
 
+export const placeCaretAtEnd = (el) => {
+    let documentBody = <any>document.body;
+    el.focus();
+    if (typeof window.getSelection != "undefined"
+        && typeof document.createRange != "undefined") {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        // IE
+    } else if (typeof documentBody.createTextRange != "undefined") {
+        var textRange = documentBody.createTextRange();
+        textRange.moveToElementText(el);
+        textRange.collapse(false);
+        textRange.select();
+    }
+}
+
